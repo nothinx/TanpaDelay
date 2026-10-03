@@ -101,6 +101,23 @@ cd extras/simulasi
 python gambar.py   # butuh g++ dan matplotlib
 ```
 
+## Kecepatan & memori
+
+Diukur dengan simavr (simulator ATmega328P yang akurat per siklus) di Arduino Uno 16 MHz, interval 10 ms. "Belum waktunya" adalah jalur yang paling sering (hampir setiap `loop()`); "kejadian" memajukan `millis()` 10 ms di setiap panggilan (±24 siklus ikut terhitung). Termasuk pemanggilan `millis()` itu sendiri.
+
+| | TanpaDelay 1.0.1 | TanpaDelay 1.0.0 | NoDelay 2.2.0 | Neotimer 1.1.6 | arduino-timer 3.0.1 |
+|---|---|---|---|---|---|
+| Belum waktunya | 98 siklus (6 µs) | 98 | 108 | 84 | 246 |
+| Kejadian | 149 (9 µs) | 725 (45 µs) | 139 | 130 | 329 |
+| RAM per objek | 9 B | 9 B | 16 B | 13 B | 16 B (`Timer<1>`) |
+| Flash tambahan | 302 B | 254 B | 180 B | 254 B | 430 B |
+
+`waktunya()` O(1) waktu dan memori. Di 1.0.1 jalur kejadian tidak lagi memakai modulo 32 bit (±600 siklus di AVR) kecuali `loop()` benar-benar terlambat lebih dari satu interval, jadi kejadian 5× lebih cepat dengan jadwal tetap tanpa drift.
+
+Di mana kita kalah: Neotimer ±15 siklus lebih cepat di jalur tunggu dan NoDelay/Neotimer ±10–20 siklus di jalur kejadian, karena mereka hanya menulis `start = millis()`. Itulah sumber drift di tabel di bawah; TanpaDelay butuh satu pembanding lagi untuk tetap di jadwal dan tidak mengejar setelah macet. NoDelay ±120 B lebih kecil di flash.
+
+Mengulang pengukuran: sketch `extras/benchmark/TanpaDelayBenchmark` (butuh simavr).
+
 ## Sekali jalan
 
 Untuk "lakukan sesuatu X detik lagi", pakai `setelah()` lalu periksa `selesai()`:
@@ -199,7 +216,7 @@ g++ -std=c++11 -I. -I../../src uji.cpp ../../src/TanpaDelay.cpp -o uji && ./uji
 
 ## Status
 
-Versi 1.0.0 sudah lolos uji logika otomatis dan compile di 7 board. Library ini murni perangkat lunak (hanya memakai `millis()`). Jika menemukan masalah, silakan buka *issue* di GitHub.
+Versi 1.0.1 sudah lolos uji logika otomatis dan compile di 7 board. Library ini murni perangkat lunak (hanya memakai `millis()`). Jika menemukan masalah, silakan buka *issue* di GitHub.
 
 ## Lisensi
 

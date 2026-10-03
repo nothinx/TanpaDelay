@@ -56,6 +56,19 @@ With `delay()` the two LEDs wait for each other and both cycle every 1.6 s. With
 
 The plots come from a PC simulation that runs this library's code (`extras/simulasi`): `cd extras/simulasi && python gambar.py` (needs g++ and matplotlib).
 
+## Speed & memory
+
+Measured with simavr (cycle-accurate ATmega328P simulator), Arduino Uno 16 MHz, 10 ms interval, including the `millis()` call.
+
+| | TanpaDelay 1.0.1 | 1.0.0 | NoDelay 2.2.0 | Neotimer 1.1.6 | arduino-timer 3.0.1 |
+|---|---|---|---|---|---|
+| Not yet due | 98 cycles (6 µs) | 98 | 108 | 84 | 246 |
+| Due | 149 (9 µs) | 725 | 139 | 130 | 329 |
+| RAM per object | 9 B | 9 B | 16 B | 13 B | 16 B |
+| Extra flash | 302 B | 254 B | 180 B | 254 B | 430 B |
+
+`waktunya()` is O(1). Since 1.0.1 the due path avoids a 32-bit modulo unless `loop()` fell more than one interval behind (5× faster). NoDelay and Neotimer are 10–20 cycles faster because they simply set `start = millis()`, which is exactly what makes them drift. Benchmark sketch: `extras/benchmark/TanpaDelayBenchmark`.
+
 ## Function reference
 
 | Indonesian | English | Notes |
@@ -80,7 +93,7 @@ An interval of `0` makes `waktunya()` return `true` on every call.
 
 ## Status
 
-Version 1.0.0 passes automated logic tests and compiles on Uno, Mega, ESP32, ESP32-C3, ESP32-S3, STM32 Blackpill F411, and Bluepill F103. It is pure software and only uses `millis()`.
+Version 1.0.1 passes automated logic tests and compiles on Uno, Mega, ESP32, ESP32-C3, ESP32-S3, STM32 Blackpill F411, and Bluepill F103. It is pure software and only uses `millis()`.
 
 ## License
 
