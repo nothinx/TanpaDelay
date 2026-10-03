@@ -1,0 +1,15 @@
+#######################################
+# TanpaDelay
+#######################################
+
+TanpaDelay	KEYWORD1
+
+waktunya	KEYWORD2
+selesai	KEYWORD2
+setiap	KEYWORD2
+setelah	KEYWORD2
+mulai	KEYWORD2
+berhenti	KEYWORD2
+ubahInterval	KEYWORD2
+sedangJalan	KEYWORD2
+sisaWaktu	KEYWORD2
