@@ -40,6 +40,22 @@ void loop() {
 
 From the source of popular English libraries: arduino-timer, Ticker (sstaub), TimerEvent, and TaskScheduler are callback-based. arduino-timer, Ticker, TimerEvent, NoDelay, and Neotimer reschedule from the current `millis()`, so the period drifts by the loop latency. millisDelay has no drift with a manual `repeat()` call, but fires in a burst after a stall. kiryanenko's SimpleTimer compares `_start + _interval <= millis()`, which stops working after `millis()` wraps. Measured on an Uno: NoDelay 16 B and Neotimer 13 B per object, the default arduino-timer 256 B.
 
+## Simulation results
+
+![Event time minus the ideal n × 500 ms schedule over 10 minutes](extras/gambar/drift.svg)
+
+Simulated `loop()` taking 5–9 ms (7 ms average) with a 500 ms interval. The `last = millis()` pattern falls 3.8 s behind after 10 minutes; TanpaDelay stays within 8 ms of the schedule.
+
+![Events before and after a 1.7 s loop() stall](extras/gambar/loop-macet.svg)
+
+After a single 1.7 s stall, millisDelay (SafeString, with `repeat()`) catches up with 3 back-to-back events within 16 ms. TanpaDelay fires once and returns to multiples of 500 ms.
+
+![Two LEDs, 500 ms and 300 ms, with delay() vs TanpaDelay](extras/gambar/dua-led.svg)
+
+With `delay()` the two LEDs wait for each other and both cycle every 1.6 s. With TanpaDelay they cycle at exactly 1.0 s and 0.6 s.
+
+The plots come from a PC simulation that runs this library's code (`extras/simulasi`): `cd extras/simulasi && python gambar.py` (needs g++ and matplotlib).
+
 ## Function reference
 
 | Indonesian | English | Notes |

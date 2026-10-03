@@ -81,6 +81,26 @@ void loop() {
 }
 ```
 
+## Hasil simulasi
+
+![Selisih waktu kejadian terhadap jadwal n × 500 ms selama 10 menit: pola terakhir = millis() makin tertinggal, TanpaDelay tetap di jadwal](extras/gambar/drift.svg)
+
+Simulasi `loop()` yang butuh 5–9 ms (rata-rata 7 ms) dengan interval 500 ms. Pola `terakhir = millis()` menghitung jadwal dari saat diperiksa, jadi keterlambatan tiap kejadian menumpuk menjadi 3,8 detik setelah 10 menit. TanpaDelay tidak pernah lebih dari 8 ms dari jadwal.
+
+![Kejadian waktunya() sebelum dan sesudah loop() macet 1,7 detik: millisDelay mengejar 3 kali beruntun, TanpaDelay sekali](extras/gambar/loop-macet.svg)
+
+`loop()` tertahan 1,7 detik satu kali. millisDelay (SafeString, dengan `repeat()`) mengejar interval yang terlewat dengan 3 kejadian beruntun dalam 16 ms. TanpaDelay hanya true sekali, lalu kembali ke kelipatan 500 ms.
+
+![Dua LED 500 ms dan 300 ms: dengan delay() keduanya bergantian dan melambat, dengan TanpaDelay keduanya tepat](extras/gambar/dua-led.svg)
+
+Dengan `delay()`, LED kedua menunggu LED pertama selesai, sehingga keduanya berkedip dengan siklus 1,6 detik. Dengan TanpaDelay (seperti contoh `DuaLEDBedaKecepatan`), siklusnya tepat 1,0 dan 0,6 detik.
+
+Grafik dibuat dari simulasi di PC yang menjalankan kode library ini (`extras/simulasi`):
+```sh
+cd extras/simulasi
+python gambar.py   # butuh g++ dan matplotlib
+```
+
 ## Sekali jalan
 
 Untuk "lakukan sesuatu X detik lagi", pakai `setelah()` lalu periksa `selesai()`:
@@ -166,7 +186,7 @@ Semua library di bawah ini berbahasa Inggris. Temuan diambil dari source code ma
 | millisDelay (SafeString) | ✅ | ✅ lewat `repeat()` manual | Mengejar berondongan setelah `loop()` macet |
 | SimpleTimer (kiryanenko) | ✅ | — | `_start + _interval <= millis()`: berhenti bekerja setelah `millis()` meluap |
 
-"Drift" artinya jadwal berikutnya dihitung dari saat diperiksa, bukan dari jadwal sebelumnya. Jika `loop()` butuh 7 ms, interval 500 ms bisa menjadi 506 ms, dan selisihnya menumpuk terus.
+"Drift" artinya jadwal berikutnya dihitung dari saat diperiksa, bukan dari jadwal sebelumnya. Jika `loop()` butuh 7 ms, interval 500 ms bisa menjadi 504 ms, dan selisihnya menumpuk terus.
 
 ## Pengujian
 
