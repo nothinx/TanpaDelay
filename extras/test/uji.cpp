@@ -45,6 +45,17 @@ int main() {
     waktuPalsu = 3500;
     assert(t.waktunya());
   }
+  { // batas jalur cepat: telat 1 ms kurang dari satu interval vs tepat satu interval
+    for (uint32_t telat = 498; telat <= 501; telat++) {
+      waktuPalsu = 0;
+      TanpaDelay t(500);
+      waktuPalsu = 500 + telat;
+      assert(t.waktunya());
+      uint32_t berikut = telat < 500 ? 1000 : 1500; // jadwal tetap di kelipatan 500
+      assert(t.sisaWaktu() == berikut - waktuPalsu);
+      assert(!t.waktunya());
+    }
+  }
   { // tanpa interval: belum jalan sampai setelah()/setiap()
     waktuPalsu = 0;
     TanpaDelay t;

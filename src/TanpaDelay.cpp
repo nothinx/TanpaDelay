@@ -9,7 +9,10 @@ bool TanpaDelay::waktunya() {
   } else {
     // Maju kelipatan interval, bukan _mulai = millis(): irama tidak bergeser,
     // dan interval yang terlewat saat loop() macet dilompati, bukan dikejar.
-    _mulai += _interval ? lewat - lewat % _interval : lewat;
+    // Biasanya telat kurang dari satu interval: cukup tambah, tanpa modulo
+    // 32 bit yang di AVR memakan ±600 siklus.
+    if (lewat - _interval < _interval) _mulai += _interval;
+    else _mulai += _interval ? lewat - lewat % _interval : lewat;
   }
   return true;
 }
